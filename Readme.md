@@ -26,11 +26,12 @@
 | **Windows Subsystem for Linux (WSL)** | Permite ejecutar un entorno Linux dentro de Windows |
 | **Docker Desktop + Docker CLI** | Motor de contenedores y su interfaz gráfica |
 | **Git Bash** | Terminal compatible con comandos Unix en Windows |
+| **Wireshark** | Herramienta sniffer para el analisís de redes |
 
 ### ⚠️ Nota importante de instalación
 
 - Al instalar **Docker Desktop**, se incluye automáticamente el **Docker CLI** y el **WSL**.
-- **Git Bash** debe instalarse **por separado** (no viene incluido con Docker).
+- **Git Bash y Wireshark** deben instalarse **por separado** (no viene incluido con Docker).
 
 ---
 
