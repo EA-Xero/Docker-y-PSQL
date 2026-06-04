@@ -1,0 +1,39 @@
+services:
+  db-server:
+    image: postgres:latest
+    container_name: psql_server
+    environment:
+      POSTGRES_USER: taller_user
+      POSTGRES_PASSWORD: taller_password
+      POSTGRES_DB: taller_redes
+    ports:
+      - "5432:5432"
+    networks:
+      - red-taller
+
+  db-client:
+    image: python:3.11-slim
+    container_name: psql_client
+    tty: true
+    stdin_open: true
+    depends_on:
+      - db-server
+    command: >
+      sh -c "pip install --upgrade pip && pip install \"psycopg[binary]\" pgcli && tail -f /dev/null"
+    networks:
+      - red-taller
+
+  network-analyzer:
+    image: nicolaka/netshoot
+    container_name: psql_analyzer
+    network_mode: "service:db-server"
+    tty: true
+    stdin_open: true
+    depends_on:
+      - db-server
+    volumes:
+      - ./capturas:/capturas
+
+networks:
+  red-taller:
+    driver: bridge
