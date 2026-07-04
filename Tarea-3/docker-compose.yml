@@ -1,0 +1,60 @@
+services:
+  # --- CONTENEDOR SERVIDOR DE POSTGRESQL ---
+  db-server:
+    image: postgres:latest
+    container_name: psql_server
+    environment:
+      POSTGRES_USER: taller_user
+      POSTGRES_PASSWORD: taller_password
+      POSTGRES_DB: taller_redes
+    networks:
+      red_servidor:
+        ipv4_address: 192.168.20.10
+    cap_add:
+      - NET_ADMIN
+
+  # --- CONTENEDOR CLIENTE (PYTHON + PGCLI) ---
+  db-client:
+    image: python:3.11-slim
+    container_name: psql_client
+    tty: true
+    stdin_open: true
+    depends_on:
+      - firewall
+    command: >
+      sh -c "pip install --upgrade pip && pip install \"psycopg[binary]\" pgcli && tail -f /dev/null"
+    networks:
+      red_cliente:
+        ipv4_address: 192.168.10.10
+    cap_add:
+      - NET_ADMIN
+
+  # --- CONTENEDOR FIREWALL Y ATACANTE SCAPY ---
+  firewall:
+    image: nicolaka/netshoot
+    container_name: psql_firewall
+    tty: true
+    stdin_open: true
+    # Forzar el reenvío de paquetes en el kernel del contenedor
+    sysctls:
+      net.ipv4.ip_forward: "1"
+    networks:
+      red_cliente:
+        ipv4_address: 192.168.10.254
+      red_servidor:
+        ipv4_address: 192.168.20.254
+    cap_add:
+      - NET_ADMIN
+
+# --- REDES AISLADAS MULTIMALLA ---
+networks:
+  red_cliente:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.10.0/24
+  red_servidor:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.20.0/24
